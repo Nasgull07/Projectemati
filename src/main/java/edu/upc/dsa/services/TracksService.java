@@ -15,7 +15,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
-
 @Api(value = "/tracks", description = "Endpoint to Track Service")
 @Path("/tracks")
 public class TracksService {
@@ -29,8 +28,6 @@ public class TracksService {
             this.tm.addTrack("Despacito", "Luis Fonsi");
             this.tm.addTrack("Enter Sandman", "Metallica");
         }
-
-
     }
 
     @GET
@@ -38,15 +35,12 @@ public class TracksService {
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Successful", response = Track.class, responseContainer="List"),
     })
-    @Path("/")
+    // Elimina @Path("/") porque ya tienes /tracks a nivel de clase
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTracks() {
-
         List<Track> tracks = this.tm.findAll();
-
         GenericEntity<List<Track>> entity = new GenericEntity<List<Track>>(tracks) {};
-        return Response.status(201).entity(entity).build()  ;
-
+        return Response.status(201).entity(entity).build();
     }
 
     @GET
@@ -60,7 +54,7 @@ public class TracksService {
     public Response getTrack(@PathParam("id") String id) {
         Track t = this.tm.getTrack(id);
         if (t == null) return Response.status(404).build();
-        else  return Response.status(201).entity(t).build();
+        else return Response.status(201).entity(t).build();
     }
 
     @DELETE
@@ -78,36 +72,32 @@ public class TracksService {
     }
 
     @PUT
+    @Path("/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "update a Track", notes = "asdasd")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Successful"),
             @ApiResponse(code = 404, message = "Track not found")
     })
-    @Path("/")
-    public Response updateTrack(Track track) {
-
+    public Response updateTrack(@PathParam("id") String id, Track track) {
+        track.setId(id); // Asegúrate de que el ID esté en el objeto
         Track t = this.tm.updateTrack(track);
-
         if (t == null) return Response.status(404).build();
-
         return Response.status(201).build();
     }
-
-
 
     @POST
     @ApiOperation(value = "create a new Track", notes = "asdasd")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Successful", response=Track.class),
             @ApiResponse(code = 500, message = "Validation Error")
-
     })
-
-    @Path("/")
+    // Elimina @Path("/") porque ya tienes /tracks a nivel de clase
     @Consumes(MediaType.APPLICATION_JSON)
     public Response newTrack(Track track) {
-
-        if (track.getSinger()==null || track.getTitle()==null)  return Response.status(500).entity(track).build();
+        if (track.getSinger() == null || track.getTitle() == null) {
+            return Response.status(500).entity(track).build();
+        }
         this.tm.addTrack(track);
         return Response.status(201).entity(track).build();
     }
